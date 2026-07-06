@@ -1,0 +1,124 @@
+{
+  "title": "Microservices Observability",
+  "uid": "microservices-obs",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "10s",
+  "time": { "from": "now-15m", "to": "now" },
+  "panels": [
+    {
+      "id": 1,
+      "title": "Request Rate — Service A (req/s)",
+      "type": "timeseries",
+      "gridPos": { "x": 0, "y": 0, "w": 12, "h": 8 },
+      "targets": [
+        {
+          "datasource": "Prometheus",
+          "expr": "rate(service_a_requests_total[1m])",
+          "legendFormat": "{{method}} {{endpoint}} [{{status}}]"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Orders Processed — Service B (req/s)",
+      "type": "timeseries",
+      "gridPos": { "x": 12, "y": 0, "w": 12, "h": 8 },
+      "targets": [
+        {
+          "datasource": "Prometheus",
+          "expr": "rate(service_b_orders_processed_total[1m])",
+          "legendFormat": "{{status}}"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "P99 Latency — Service A (ms)",
+      "type": "timeseries",
+      "gridPos": { "x": 0, "y": 8, "w": 12, "h": 8 },
+      "targets": [
+        {
+          "datasource": "Prometheus",
+          "expr": "histogram_quantile(0.99, rate(service_a_request_latency_seconds_bucket[1m])) * 1000",
+          "legendFormat": "p99 {{endpoint}}"
+        },
+        {
+          "datasource": "Prometheus",
+          "expr": "histogram_quantile(0.50, rate(service_a_request_latency_seconds_bucket[1m])) * 1000",
+          "legendFormat": "p50 {{endpoint}}"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "P99 Latency — Service B processing (ms)",
+      "type": "timeseries",
+      "gridPos": { "x": 12, "y": 8, "w": 12, "h": 8 },
+      "targets": [
+        {
+          "datasource": "Prometheus",
+          "expr": "histogram_quantile(0.99, rate(service_b_processing_duration_seconds_bucket[1m])) * 1000",
+          "legendFormat": "p99 processing"
+        },
+        {
+          "datasource": "Prometheus",
+          "expr": "histogram_quantile(0.99, rate(service_b_db_query_seconds_bucket[1m])) * 1000",
+          "legendFormat": "p99 DB query"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "Error Rate — Service A downstream errors/s",
+      "type": "stat",
+      "gridPos": { "x": 0, "y": 16, "w": 6, "h": 4 },
+      "targets": [
+        {
+          "datasource": "Prometheus",
+          "expr": "rate(service_a_downstream_errors_total[1m])",
+          "legendFormat": "errors/s"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "title": "Success vs Error — Service B",
+      "type": "piechart",
+      "gridPos": { "x": 6, "y": 16, "w": 6, "h": 8 },
+      "targets": [
+        {
+          "datasource": "Prometheus",
+          "expr": "sum(service_b_orders_processed_total) by (status)",
+          "legendFormat": "{{status}}"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "title": "Total Requests — Service A",
+      "type": "stat",
+      "gridPos": { "x": 12, "y": 16, "w": 6, "h": 4 },
+      "targets": [
+        {
+          "datasource": "Prometheus",
+          "expr": "sum(service_a_requests_total)",
+          "legendFormat": "total"
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "title": "Total Orders Processed — Service B",
+      "type": "stat",
+      "gridPos": { "x": 18, "y": 16, "w": 6, "h": 4 },
+      "targets": [
+        {
+          "datasource": "Prometheus",
+          "expr": "sum(service_b_orders_processed_total)",
+          "legendFormat": "total"
+        }
+      ]
+    }
+  ]
+}
